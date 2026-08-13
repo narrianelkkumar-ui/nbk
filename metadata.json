@@ -1,0 +1,6 @@
+{
+  "name": "Brahmanee Land Survey Tools",
+  "description": "Licensed Land Surveyor in Telangana offering DGPS surveys, AutoCAD Tippon plotting, coordinate tables, and cadastral mapping software.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
