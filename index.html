@@ -1,2078 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRAHMANEE LAND SURVEY TOOLS | Professional AutoLISP Automation Suite for AutoCAD & Civil 3D</title>
-    <meta name="description" content="Professional land survey automation software for AutoCAD & Civil 3D. 13 purpose-built AutoLISP commands for Tippon drawing, coordinate tables, area calculations & Telangana cadastral surveys. Built by Narri Anel Kkumar.">
-    <meta name="keywords" content="Brahmanee Land Survey Tools, AutoLISP Survey Tools, AutoCAD Survey Automation, Telangana Land Survey Software, Tippon Drawing AutoLISP, Land Survey AutoLISP, AutoCAD Tippon, Surveying Automation, Cadastral Survey AutoLISP, Civil 3D Survey Tools, Narri Anel Kkumar">
-    <meta name="author" content="Narri Anel Kkumar">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://brahmanee.com">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Brahmanee Land Survey Tools | Professional AutoLISP Suite">
-    <meta property="og:description" content="Automate land survey drafting, Tippon vectors, coordinate tables, and area conversions inside AutoCAD in seconds.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://brahmanee.com">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='10' fill='%23071018'/%3E%3Cpath d='M20 80 L50 20 L80 80 Z' fill='none' stroke='%2300E5FF' stroke-width='8' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='55' r='8' fill='%23FF6B00'/%3E%3C/svg%3E">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* ==========================================================================
-           ENGINEERING COLOR SYSTEM & VARIABLES
-           ========================================================================== */
-        :root {
-            --bg-primary: #071018;
-            --bg-secondary: #0D1720;
-            --bg-surface: #111D27;
-            --border-color: #263744;
-            --border-bright: #3A5266;
-            
-            --text-main: #F5F7FA;
-            --text-muted: #9AAAB8;
-            --text-dim: #62778A;
-            
-            --accent-cyan: #00E5FF;
-            --accent-cyan-glow: rgba(0, 229, 255, 0.25);
-            --accent-orange: #FF6B00;
-            --accent-orange-glow: rgba(255, 107, 0, 0.25);
-            --emerald-green: #10B981;
-            
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        /* RESET & BASE */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* TECHNICAL GRID OVERLAY */
-        #cad-bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.45;
-        }
-
-        /* TYPOGRAPHY */
-        h1, h2, h3, h4, .display-font {
-            font-family: var(--font-display);
-            letter-spacing: -0.02em;
-            line-height: 1.12;
-            color: var(--text-main);
-        }
-
-        .mono {
-            font-family: var(--font-mono);
-        }
-
-        /* CONTAINER */
-        .container {
-            width: 100%;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .section {
-            padding: 110px 0;
-            position: relative;
-            border-bottom: 1px solid rgba(38, 55, 68, 0.4);
-        }
-
-        /* NAVIGATION */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 22px 0;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            background: transparent;
-        }
-
-        .navbar.scrolled {
-            padding: 14px 0;
-            background: rgba(7, 16, 24, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid var(--accent-cyan);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-cyan);
-        }
-
-        .logo-text-title {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: 0.04em;
-        }
-
-        .logo-text-sub {
-            font-family: var(--font-mono);
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            letter-spacing: 0.12em;
-            display: block;
-        }
-
-        .nav-center-links {
-            display: none;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
-        }
-
-        @media (min-width: 1024px) {
-            .nav-center-links { display: flex; }
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            font-family: var(--font-mono);
-            letter-spacing: 0.05em;
-            transition: color 0.2s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--accent-cyan);
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        /* BUTTONS */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 13px 26px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            letter-spacing: 0.04em;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid transparent;
-            white-space: nowrap;
-            text-transform: uppercase;
-        }
-
-        .btn-cyan {
-            background: var(--accent-cyan);
-            color: #04090E;
-            box-shadow: 0 0 20px var(--accent-cyan-glow);
-            border-color: var(--accent-cyan);
-        }
-
-        .btn-cyan:hover {
-            background: #33ECFF;
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--accent-cyan-glow);
-        }
-
-        .btn-orange {
-            background: var(--accent-orange);
-            color: #FFFFFF;
-            box-shadow: 0 0 20px var(--accent-orange-glow);
-            border-color: var(--accent-orange);
-        }
-
-        .btn-orange:hover {
-            background: #FF7B1A;
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--accent-orange-glow);
-        }
-
-        .btn-outline {
-            background: rgba(17, 29, 39, 0.6);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            background: var(--bg-surface);
-            transform: translateY(-2px);
-        }
-
-        /* TECHNICAL BADGE */
-        .tech-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 2px;
-            background: rgba(0, 229, 255, 0.06);
-            border: 1px solid var(--border-color);
-            color: var(--accent-cyan);
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 22px;
-        }
-
-        .tech-badge-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent-cyan);
-            box-shadow: 0 0 8px var(--accent-cyan);
-        }
-
-        /* HERO SECTION */
-        .hero {
-            padding: 160px 0 100px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 48px;
-            align-items: center;
-        }
-
-        @media (min-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr 1.05fr; }
-        }
-
-        .hero-title {
-            font-size: clamp(2.4rem, 4.6vw, 3.8rem);
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            line-height: 1.08;
-        }
-
-        .hero-title-highlight {
-            color: var(--accent-cyan);
-            display: block;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1rem, 1.6vw, 1.15rem);
-            color: var(--text-muted);
-            margin-bottom: 36px;
-            max-width: 580px;
-        }
-
-        .hero-ctas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 40px;
-        }
-
-        .hero-trust-bar {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            padding-top: 28px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        @media (min-width: 640px) {
-            .hero-trust-bar { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        .trust-item-val {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-            display: block;
-        }
-
-        .trust-item-lbl {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* HERO CAD WORKSPACE SIMULATOR */
-        .cad-workspace-frame {
-            background: #04090E;
-            border: 1px solid var(--border-bright);
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 229, 255, 0.12);
-            position: relative;
-        }
-
-        .cad-header-bar {
-            background: #0B141D;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-            font-family: var(--font-mono);
-            font-size: 0.76rem;
-            color: var(--text-muted);
-        }
-
-        .cad-status-pills {
-            display: flex;
-            gap: 12px;
-        }
-
-        .cad-pill {
-            background: rgba(0, 229, 255, 0.1);
-            color: var(--accent-cyan);
-            padding: 2px 8px;
-            border-radius: 2px;
-            font-size: 0.7rem;
-            border: 1px solid rgba(0, 229, 255, 0.3);
-        }
-
-        #heroCadCanvas {
-            width: 100%;
-            height: 400px;
-            background: #020609;
-            display: block;
-        }
-
-        .cad-command-line {
-            background: #060D14;
-            padding: 10px 16px;
-            border-top: 1px solid var(--border-color);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--accent-cyan);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* SECTION HEADERS */
-        .section-header {
-            text-align: center;
-            max-width: 820px;
-            margin: 0 auto 64px;
-        }
-
-        .section-title {
-            font-size: clamp(1.8rem, 3.4vw, 2.8rem);
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-        }
-
-        /* SECTION 2 - PROBLEM STORYTELLING */
-        .problem-sim-wrapper {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 28px;
-        }
-
-        @media (min-width: 900px) {
-            .problem-sim-wrapper { grid-template-columns: 1fr 1fr; }
-        }
-
-        .problem-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 32px;
-            position: relative;
-        }
-
-        .problem-card-manual {
-            border-top: 3px solid #EF4444;
-        }
-
-        .problem-card-auto {
-            border-top: 3px solid var(--accent-cyan);
-            background: #0D1B26;
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.08);
-        }
-
-        .problem-card-title {
-            font-family: var(--font-mono);
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .process-flow-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .p-step {
-            background: rgba(7, 16, 24, 0.8);
-            border: 1px solid var(--border-color);
-            padding: 12px 16px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .p-step-bad { color: #FCA5A5; border-color: rgba(239, 68, 68, 0.3); }
-        .p-step-good { color: var(--text-main); border-color: rgba(0, 229, 255, 0.3); }
-
-        /* SECTION 3 - COMMAND CONSOLE */
-        .console-container {
-            background: #04090E;
-            border: 1px solid var(--border-bright);
-            border-radius: 6px;
-            display: grid;
-            grid-template-columns: 1fr;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-        }
-
-        @media (min-width: 900px) {
-            .console-container { grid-template-columns: 280px 1fr; }
-        }
-
-        .console-sidebar {
-            background: #08111A;
-            border-right: 1px solid var(--border-color);
-            padding: 16px 0;
-            max-height: 520px;
-            overflow-y: auto;
-        }
-
-        .console-cmd-btn {
-            width: 100%;
-            padding: 12px 20px;
-            background: transparent;
-            border: none;
-            border-left: 3px solid transparent;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 0.88rem;
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .console-cmd-btn:hover, .console-cmd-btn.active {
-            background: rgba(0, 229, 255, 0.08);
-            color: var(--accent-cyan);
-            border-left-color: var(--accent-cyan);
-        }
-
-        .console-main-panel {
-            padding: 32px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-        }
-
-        @media (min-width: 1100px) {
-            .console-main-panel { grid-template-columns: 1fr 1fr; }
-        }
-
-        .console-info-box {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .console-field-lbl {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-
-        .console-field-val {
-            font-size: 0.95rem;
-            color: var(--text-main);
-            background: #0A141E;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: var(--font-mono);
-        }
-
-        #cmdCanvasPreview {
-            width: 100%;
-            height: 320px;
-            background: #020508;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            display: block;
-        }
-
-        /* SECTION 4 - TIPPON SIGNATURE CANVAS */
-        .tippon-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 32px;
-            align-items: center;
-        }
-
-        @media (min-width: 1024px) {
-            .tippon-grid { grid-template-columns: 340px 1fr; }
-        }
-
-        .keypad-matrix {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            background: var(--bg-surface);
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        .key-btn {
-            background: #0B1620;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 16px 8px;
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            transition: all 0.15s ease;
-            user-select: none;
-        }
-
-        .key-btn:hover {
-            background: var(--accent-cyan);
-            color: #000;
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 15px var(--accent-cyan-glow);
-        }
-
-        .key-sub {
-            font-size: 0.65rem;
-            color: var(--accent-orange);
-            font-weight: 600;
-        }
-
-        .key-btn:hover .key-sub {
-            color: #000;
-        }
-
-        #tipponInteractiveCanvas {
-            width: 100%;
-            height: 420px;
-            background: #020508;
-            border: 1px solid var(--border-bright);
-            border-radius: 6px;
-            display: block;
-        }
-
-        .tippon-metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .metric-box {
-            background: #0A141E;
-            border: 1px solid var(--border-color);
-            padding: 12px 14px;
-            border-radius: 4px;
-        }
-
-        .metric-val {
-            font-family: var(--font-mono);
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent-orange);
-        }
-
-        /* SECTION 5 - BEFORE / AFTER SLIDER */
-        .ba-container {
-            position: relative;
-            width: 100%;
-            height: 440px;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid var(--border-bright);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            user-select: none;
-        }
-
-        #baCanvasLeft, #baCanvasRight {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ba-slider-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: var(--accent-cyan);
-            box-shadow: 0 0 12px var(--accent-cyan);
-            cursor: ew-resize;
-            z-index: 10;
-        }
-
-        .ba-slider-handle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 36px;
-            height: 36px;
-            background: var(--accent-cyan);
-            color: #000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.8rem;
-        }
-
-        /* SECTION 6 - WORKFLOW DIAGRAM */
-        .workflow-diagram {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 16px;
-            margin-top: 40px;
-            position: relative;
-        }
-
-        .wf-node {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 24px 16px;
-            text-align: center;
-            position: relative;
-            transition: all 0.25s ease;
-        }
-
-        .wf-node:hover {
-            border-color: var(--accent-cyan);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.12);
-        }
-
-        .wf-step-num {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--accent-cyan);
-            margin-bottom: 8px;
-        }
-
-        .wf-step-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* SECTION 7 - PERFORMANCE STATS */
-        .stats-hero-banner {
-            background: linear-gradient(135deg, #091520, #04090E);
-            border: 1px solid var(--border-bright);
-            border-radius: 6px;
-            padding: 60px 32px;
-            text-align: center;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 40px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-        }
-
-        .stat-num {
-            font-size: clamp(2.8rem, 4.5vw, 4rem);
-            font-weight: 700;
-            font-family: var(--font-display);
-            color: var(--accent-cyan);
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .stat-lbl {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* SECTION 9 - WHY BRAHMANEE PILLARS */
-        .pillars-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-        }
-
-        .pillar-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 32px;
-            transition: all 0.25s ease;
-        }
-
-        .pillar-card:hover {
-            border-color: var(--border-bright);
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-
-        .pillar-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid var(--border-bright);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-cyan);
-            margin-bottom: 20px;
-        }
-
-        .pillar-num {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--accent-orange);
-            margin-bottom: 8px;
-        }
-
-        .pillar-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        /* SECTION 10 - FOUNDER */
-        .founder-box {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-bright);
-            border-radius: 6px;
-            padding: 40px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 32px;
-            align-items: center;
-        }
-
-        @media (min-width: 900px) {
-            .founder-box { grid-template-columns: 240px 1fr; }
-        }
-
-        .founder-avatar {
-            width: 180px;
-            height: 180px;
-            border-radius: 6px;
-            background: #0B1824;
-            border: 2px solid var(--accent-cyan);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-cyan);
-            font-family: var(--font-display);
-            font-size: 3rem;
-            font-weight: 800;
-            margin: 0 auto;
-            box-shadow: 0 0 25px var(--accent-cyan-glow);
-        }
-
-        /* SECTION 12 - PRICING */
-        .pricing-box {
-            background: linear-gradient(145deg, #0D1A26, #050B10);
-            border: 2px solid var(--accent-cyan);
-            border-radius: 8px;
-            padding: 56px 40px;
-            max-width: 650px;
-            margin: 0 auto;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 229, 255, 0.15);
-        }
-
-        .price-val {
-            font-size: 4rem;
-            font-weight: 700;
-            font-family: var(--font-display);
-            color: var(--text-main);
-            margin: 16px 0;
-        }
-
-        .price-list {
-            list-style: none;
-            margin: 36px 0;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .price-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
-
-        .price-item svg {
-            color: var(--accent-cyan);
-            flex-shrink: 0;
-        }
-
-        /* FAQ ACCORDION */
-        .faq-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 860px;
-            margin: 0 auto;
-        }
-
-        .faq-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .faq-head {
-            padding: 20px 24px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            user-select: none;
-        }
-
-        .faq-head:hover {
-            color: var(--accent-cyan);
-        }
-
-        .faq-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 0 24px;
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            line-height: 1.7;
-        }
-
-        .faq-card.active .faq-body {
-            max-height: 300px;
-            padding-bottom: 20px;
-        }
-
-        /* FOOTER */
-        .footer {
-            background: #03070B;
-            border-top: 1px solid var(--border-color);
-            padding: 60px 0 30px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        /* MOBILE STICKY BOTTOM BAR */
-        .mobile-bottom-bar {
-            display: flex;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            z-index: 999;
-            background: #050B10;
-            border-top: 1px solid var(--border-bright);
-            padding: 10px 16px;
-            gap: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .mobile-bottom-bar { display: none; }
-        }
-
-        /* SCROLL REVEAL ANIMATION */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRAHMANEE LAND SURVEY TOOLS | AutoLISP Suite for Telangana Cadastral Surveying</title>
+<meta name="description" content="Professional AutoLISP automation suite for AutoCAD & Civil 3D, built by a working land surveyor for Telangana cadastral & revenue survey work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#20073F;
+  --bg-mid:#3A0F72;
+  --bg-glow:#7A1FA8;
+  --pink:#E0388E;
+  --blue:#2F8FD8;
+  --orange:#E2603A;
+  --gold:#E2A13A;
+  --violet:#7B4FD6;
+  --text:#FFFFFF;
+  --text-dim:rgba(255,255,255,0.72);
+  --text-faint:rgba(255,255,255,0.5);
+  --glass:rgba(255,255,255,0.06);
+  --glass-line:rgba(255,255,255,0.14);
+  --font-display:'Poppins',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-display); color:var(--text); background:var(--bg-deep);
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;}
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 24px;}
+h1,h2,h3{font-family:var(--font-display);font-weight:800;letter-spacing:-0.01em;line-height:1.08;}
+.mono{font-family:var(--font-mono);}
+
+/* ---- global gradient wash used behind every section ---- */
+.grad-bg{
+  position:relative;
+  background:
+    radial-gradient(120% 140% at 12% 0%, var(--bg-glow) 0%, var(--bg-mid) 38%, var(--bg-deep) 72%);
+}
+.grad-bg::before{
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(circle at 78% 20%, rgba(255,80,180,0.14), transparent 55%);
+  pointer-events:none;
+}
+section{position:relative;}
+.sect-inner{position:relative;z-index:2;}
+
+/* ---- floating spheres, reused everywhere as the signature motif ---- */
+.sphere{position:absolute;border-radius:50%;pointer-events:none;}
+.sphere::after{content:"";position:absolute;width:26%;height:16%;left:22%;top:16%;background:rgba(255,255,255,0.85);border-radius:50%;filter:blur(2px);}
+.sph-blue{background:radial-gradient(circle at 32% 26%, #8fe8ff 0%, #2f8fd8 30%, #1a4fae 58%, #0d2a70 100%);box-shadow:0 20px 40px rgba(10,20,60,0.5);}
+.sph-pink{background:radial-gradient(circle at 32% 26%, #ffb0e6 0%, #d0389a 28%, #7a1f78 56%, #360f4a 100%);box-shadow:0 24px 46px rgba(40,10,50,0.5);}
+.sph-orange{background:radial-gradient(circle at 32% 26%, #ffc9a8 0%, #e2603a 30%, #9c2a3a 58%, #4a0f22 100%);box-shadow:0 22px 44px rgba(40,10,20,0.5);}
+.sph-violet{background:radial-gradient(circle at 32% 26%, #c9b6ff 0%, #7b4fd6 30%, #4a1f9c 58%, #200a4a 100%);box-shadow:0 22px 44px rgba(20,10,50,0.5);}
+.sph-gold{background:radial-gradient(circle at 32% 26%, #ffe3a0 0%, #e2a13a 28%, #9c5a1a 56%, #4a2808 100%);box-shadow:0 22px 44px rgba(40,20,10,0.5);}
+
+/* ---- nav ---- */
+.navbar{position:sticky;top:0;z-index:1000;background:rgba(32,7,63,0.72);backdrop-filter:blur(10px);border-bottom:1px solid var(--glass-line);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:20px 0;}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:1.05rem;}
+.brand svg{width:22px;height:22px;}
+.nav-links{display:none;gap:30px;list-style:none;font-size:0.9rem;font-weight:500;opacity:0.9;}
+.nav-links a{text-decoration:none;}
+@media(min-width:960px){.nav-links{display:flex;}}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:0.86rem;font-weight:600;padding:12px 22px;border-radius:6px;text-decoration:none;cursor:pointer;transition:transform .15s ease, opacity .15s ease;}
+.btn:hover{transform:translateY(-1px);}
+.btn-fill{background:#fff;color:var(--bg-deep);}
+.btn-outline{border:1.5px solid rgba(255,255,255,0.45);color:#fff;}
+
+/* ---- hero ---- */
+.animated-brand-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.8rem, 6.5vw, 4.8rem);
+  letter-spacing: -0.01em;
+  background: linear-gradient(120deg, #FFFFFF 0%, #FFB0E6 25%, #E0388E 50%, #8FD0FF 75%, #FFFFFF 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerGlow 4s linear infinite, floatPulse 3s ease-in-out infinite alternate;
+  display: inline-block;
+  line-height: 1.05;
+}
+
+@keyframes shimmerGlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes floatPulse {
+  0% { transform: scale(1) translateY(0px); }
+  100% { transform: scale(1.02) translateY(-4px); }
+}
+
+.hero{min-height:88vh;display:flex;align-items:center;overflow:hidden;}
+.hero .sphere-field{position:absolute;right:-60px;top:0;bottom:0;width:56%;z-index:1;}
+.s1{width:140px;height:140px;left:0%;top:58%;} .s2{width:220px;height:220px;left:22%;top:10%;}
+.s3{width:180px;height:180px;left:48%;top:50%;} .s4{width:160px;height:160px;left:70%;top:6%;}
+.s5{width:200px;height:200px;left:88%;top:44%;}
+.hero-left{max-width:520px;padding:90px 0 60px;}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:22px;font-family:var(--font-mono);font-size:0.76rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);}
+.eyebrow .dash{width:26px;height:1px;background:rgba(255,255,255,0.5);}
+.hero-title{font-size:clamp(2.4rem,4.6vw,3.6rem);margin-bottom:10px;}
+.hero-title .line2{color:var(--pink);}
+.hero-kicker{font-size:1.25rem;font-weight:400;color:var(--text-dim);margin-bottom:22px;}
+.hero-desc{font-size:0.94rem;color:var(--text-faint);max-width:360px;margin-bottom:32px;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px;}
+.side-label{position:absolute;left:0;bottom:130px;display:flex;align-items:center;gap:10px;transform:rotate(-90deg);transform-origin:left bottom;font-size:0.74rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-faint);}
+.side-label .dot{width:6px;height:6px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.6);}
+.stats-row{display:flex;align-items:center;gap:14px;font-size:0.92rem;font-weight:500;color:var(--text-dim);}
+.stats-row .num{font-weight:800;font-size:1.15rem;color:#fff;}
+.stats-row .sep{opacity:0.5;}
+
+/* ---- section shell ---- */
+.section{padding:90px 0;border-bottom:1px solid var(--glass-line);}
+.section-head{max-width:640px;margin-bottom:44px;}
+.section-title{font-size:clamp(1.6rem,2.8vw,2.1rem);margin:10px 0 12px;}
+.section-sub{color:var(--text-dim);font-size:0.98rem;}
+
+/* ---- glass card ---- */
+.glass{background:var(--glass);border:1px solid var(--glass-line);border-radius:16px;backdrop-filter:blur(8px);}
+
+/* problem comparison */
+.reg-cols{display:grid;grid-template-columns:1fr;gap:20px;}
+@media(min-width:800px){.reg-cols{grid-template-columns:1fr 1fr;}}
+.reg-col{padding:26px 28px;}
+.reg-col h3{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.reg-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--glass-line);font-size:0.9rem;}
+.reg-row:last-child{border-bottom:none;}
+.reg-row span:first-child{color:var(--text-dim);}
+.reg-row span:last-child{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+.tag-bad{background:rgba(224,56,142,0.16);color:#ff9fce;}
+.tag-good{background:rgba(47,143,216,0.18);color:#8fd0ff;}
+
+/* commands */
+.cmd-shell{display:grid;grid-template-columns:1fr;overflow:hidden;}
+@media(min-width:900px){.cmd-shell{grid-template-columns:280px 1fr;}}
+.cmd-list{border-bottom:1px solid var(--glass-line);max-height:460px;overflow-y:auto;}
+@media(min-width:900px){.cmd-list{border-bottom:none;border-right:1px solid var(--glass-line);}}
+.cmd-item{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;padding:13px 20px;border-bottom:1px solid var(--glass-line);background:none;border-left:3px solid transparent;font-family:var(--font-mono);font-size:0.84rem;cursor:pointer;color:var(--text-dim);}
+.cmd-item .num{color:var(--text-faint);font-size:0.7rem;}
+.cmd-item.active{background:rgba(224,56,142,0.1);border-left-color:var(--pink);color:#fff;font-weight:600;}
+.cmd-detail{padding:28px 30px;}
+.cmd-detail .lbl{font-family:var(--font-mono);font-size:0.66rem;letter-spacing:0.08em;color:var(--text-faint);text-transform:uppercase;margin:16px 0 4px;}
+.cmd-detail .lbl:first-child{margin-top:0;}
+.cmd-detail .val{font-size:0.94rem;color:#fff;}
+.cmd-detail .val.mono-em{font-family:var(--font-mono);color:var(--pink);font-weight:600;font-size:1.15rem;}
+.cmd-detail .val.out{color:#8fd0ff;}
+
+/* tippon */
+.tippon-grid{display:grid;grid-template-columns:1fr;gap:26px;}
+@media(min-width:860px){.tippon-grid{grid-template-columns:280px 1fr;}}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:18px;}
+.key{aspect-ratio:1;border:1px solid var(--glass-line);background:rgba(255,255,255,0.04);border-radius:10px;font-family:var(--font-mono);font-size:1rem;cursor:pointer;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.key .sub{font-size:0.58rem;color:var(--text-faint);letter-spacing:0.06em;}
+.key:hover{background:rgba(224,56,142,0.14);border-color:var(--pink);}
+.key.enter{background:var(--pink);border-color:var(--pink);}
+.key.enter .sub{color:rgba(255,255,255,0.8);}
+.tippon-actions{display:flex;gap:10px;margin-top:6px;padding:0 18px 18px;}
+.tippon-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;padding:16px 18px;border-top:1px solid var(--glass-line);}
+.metric-lbl{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.08em;color:var(--text-faint);text-transform:uppercase;}
+.metric-val{font-family:var(--font-mono);font-weight:700;font-size:1.15rem;}
+.tippon-canvas-wrap{padding:8px;}
+#tipponCanvas{width:100%;height:420px;display:block;border-radius:10px;}
+
+/* pricing */
+.license-card{max-width:560px;margin:0 auto;padding:40px 40px;text-align:left;position:relative;overflow:hidden;}
+.license-price{font-size:2.7rem;font-weight:800;margin:8px 0 24px;}
+.license-price span{font-family:var(--font-mono);font-size:0.9rem;color:var(--text-faint);font-weight:400;}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.price-list li{display:flex;gap:10px;font-size:0.9rem;align-items:flex-start;color:var(--text-dim);}
+.price-list li::before{content:"✓";color:var(--blue);font-weight:700;}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;background:rgba(224,56,142,0.16);color:#ff9fce;}
+
+/* faq */
+.faq-item{border-bottom:1px solid var(--glass-line);}
+.faq-head{display:flex;justify-content:space-between;align-items:center;padding:20px 6px;cursor:pointer;font-weight:600;}
+.faq-head .mark{font-family:var(--font-mono);color:var(--pink);transition:transform .2s ease;}
+.faq-item.active .mark{transform:rotate(45deg);}
+.faq-body{max-height:0;overflow:hidden;transition:max-height .25s ease;color:var(--text-dim);font-size:0.92rem;}
+.faq-item.active .faq-body{max-height:200px;padding-bottom:20px;}
+
+/* footer */
+footer{padding:56px 0 40px;}
+.footer-grid{display:grid;grid-template-columns:1fr;gap:32px;}
+@media(min-width:800px){.footer-grid{grid-template-columns:2fr 1fr 1fr;}}
+.footer-grid h4{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:12px;}
+.footer-grid a{display:block;text-decoration:none;color:var(--text-dim);font-size:0.88rem;margin-bottom:8px;}
+.footer-grid a:hover{color:var(--pink);}
+.footer-bottom{margin-top:36px;padding-top:20px;border-top:1px solid var(--glass-line);font-family:var(--font-mono);font-size:0.74rem;color:var(--text-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+@media(max-width:900px){
+  .hero .sphere-field{width:100%;opacity:0.35;}
+  .side-label{display:none;}
+}
+</style>
 </head>
 <body>
 
-    <!-- CAD BACKGROUND GRID CANVAS -->
-    <canvas id="cad-bg-canvas"></canvas>
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="#" class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      BRAHMANEE
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problem">Why It Exists</a></li>
+      <li><a href="#commands">Commands</a></li>
+      <li><a href="#tippon">Tippon</a></li>
+      <li><a href="#pricing">License</a></li>
+      <li><a href="#faq">Support</a></li>
+    </ul>
+    <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20am%20a%20land%20surveyor%20interested%20in%20the%20AutoLISP%20software%20license." target="_blank" class="btn btn-fill">Get License</a>
+  </div>
+</header>
 
-    <!-- NAVIGATION -->
-    <header class="navbar" id="navbar">
-        <div class="container nav-container">
-            <a href="#" class="logo">
-                <div class="logo-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-                </div>
-                <div>
-                    <span class="logo-text-title">BRAHMANEE</span>
-                    <span class="logo-text-sub">LAND SURVEY TOOLS</span>
-                </div>
-            </a>
-
-            <ul class="nav-center-links">
-                <li><a href="#problem" class="nav-link">PRODUCT</a></li>
-                <li><a href="#commands" class="nav-link">COMMANDS</a></li>
-                <li><a href="#tippon" class="nav-link">TIPPON</a></li>
-                <li><a href="#workflow" class="nav-link">WORKFLOW</a></li>
-                <li><a href="#pricing" class="nav-link">PRICING</a></li>
-                <li><a href="#faq" class="nav-link">SUPPORT</a></li>
-            </ul>
-
-            <div class="nav-actions">
-                <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20am%20a%20land%20surveyor%20interested%20in%20the%20AutoLISP%20software%20license." target="_blank" class="btn btn-cyan" style="padding: 10px 18px; font-size: 0.8rem;">
-                    <span>GET LICENSE</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="container hero-grid">
-            <div class="hero-left">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>BRAHMANEE / SURVEY AUTOMATION SYSTEM</span>
-                </div>
-
-                <h1 class="hero-title">
-                    TURN SURVEY DATA INTO PRECISE CAD DRAWINGS.
-                    <span class="hero-title-highlight">FASTER. SMARTER. AUTOMATED.</span>
-                </h1>
-
-                <p class="hero-subtitle">
-                    Professional AutoLISP tools built for land surveyors, cadastral drafting and Telangana survey workflows inside AutoCAD and Civil 3D.
-                </p>
-
-                <div class="hero-ctas">
-                    <a href="https://wa.me/917711889955?text=Hello!%20I%20want%20to%20buy%20the%20Brahmanee%20AutoLISP%20License." target="_blank" class="btn btn-cyan">
-                        <span>GET BRAHMANEE LICENSE</span>
-                    </a>
-                    <a href="#demo" class="btn btn-outline">
-                        <span>WATCH DEMO</span>
-                    </a>
-                </div>
-
-                <div class="hero-trust-bar">
-                    <div>
-                        <span class="trust-item-val">13 COMMANDS</span>
-                        <span class="trust-item-lbl">AUTOLISP SUITE</span>
-                    </div>
-                    <div>
-                        <span class="trust-item-val">AUTOCAD / C3D</span>
-                        <span class="trust-item-lbl">NATIVE INTEGRATION</span>
-                    </div>
-                    <div>
-                        <span class="trust-item-val">TELANGANA</span>
-                        <span class="trust-item-lbl">REVENUE WORKFLOW</span>
-                    </div>
-                    <div>
-                        <span class="trust-item-val">OFFLINE LOCK</span>
-                        <span class="trust-item-lbl">HARDWARE SECURED</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HERO REALISTIC CAD WORKSPACE ANIMATION -->
-            <div class="cad-workspace-frame reveal">
-                <div class="cad-header-bar">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-                        <span>AUTOCAD 2026 - [BRAHMANEE_SURVEY_MAP.DWG]</span>
-                    </div>
-                    <div class="cad-status-pills">
-                        <span class="cad-pill">WCS: METRIC</span>
-                        <span class="cad-pill">SCALE 1:500</span>
-                    </div>
-                </div>
-
-                <canvas id="heroCadCanvas"></canvas>
-
-                <div class="cad-command-line">
-                    <span style="color: var(--text-dim);">Command:</span>
-                    <span id="cadCmdText">_CTABLE</span>
-                    <span style="animation: cursorBlink 1s infinite; width: 8px; height: 16px; background: var(--accent-cyan); display: inline-block;"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 2 — THE PROBLEM (VISUAL STORYTELLING) -->
-    <section class="section" id="problem">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>EFFICIENCY GAP ANALYSIS</span>
-                </div>
-                <h2 class="section-title">EVERY SURVEYOR KNOWS THE REPETITIVE WORK.</h2>
-                <p class="section-subtitle">
-                    Manual CAD plotting consumes hours per survey sheet and exposes revenue records to human calculation errors.
-                </p>
-            </div>
-
-            <div class="problem-sim-wrapper reveal">
-                <!-- Manual Card -->
-                <div class="problem-card problem-card-manual">
-                    <div class="problem-card-title">
-                        <span>MANUAL CAD DRAFTING</span>
-                        <span style="color: #EF4444; font-size: 0.82rem;">~45-60 MINS PER SHEET</span>
-                    </div>
-                    <div class="process-flow-steps">
-                        <div class="p-step p-step-bad"><span>01. Manual Coordinate Typing</span><span>SLOW</span></div>
-                        <div class="p-step p-step-bad"><span>02. Manual Line Drawing</span><span>REPETITIVE</span></div>
-                        <div class="p-step p-step-bad"><span>03. Manual Area Math (Sq.Yards / Acres)</span><span>RISK OF ERROR</span></div>
-                        <div class="p-step p-step-bad"><span>04. Excel Table Copy & Paste</span><span>CLUNKY</span></div>
-                        <div class="p-step p-step-bad"><span>05. Manual Tippon Boundary Fitting</span><span>TEDIOUS</span></div>
-                    </div>
-                </div>
-
-                <!-- Brahmanee Automated Card -->
-                <div class="problem-card problem-card-auto">
-                    <div class="problem-card-title">
-                        <span style="color: var(--accent-cyan);">BRAHMANEE AUTOMATION</span>
-                        <span style="color: var(--emerald-green); font-size: 0.82rem;">~5-8 MINS AUTOMATED</span>
-                    </div>
-                    <div class="process-flow-steps">
-                        <div class="p-step p-step-good"><span>01. Type Command (_CTABLE / _TIPPON)</span><span>INSTANT</span></div>
-                        <div class="p-step p-step-good"><span>02. Automated Vector Geometry</span><span>PRECISE</span></div>
-                        <div class="p-step p-step-good"><span>03. Auto Area Math (Acres + Guntas)</span><span>100% ACCURATE</span></div>
-                        <div class="p-step p-step-good"><span>04. Native CAD Coordinate Table</span><span>AUTOMATED</span></div>
-                        <div class="p-step p-step-good"><span>05. Tippon Keypad Parcel Plotting</span><span>1-CLICK</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 3 — COMMAND CONSOLE -->
-    <section class="section" id="commands">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>COMMAND CONSOLE</span>
-                </div>
-                <h2 class="section-title">13 COMMANDS. ONE SURVEY AUTOMATION SYSTEM.</h2>
-                <p class="section-subtitle">
-                    Inspect any specialized AutoLISP tool below to view its command syntax, purpose, and live CAD preview output.
-                </p>
-            </div>
-
-            <div class="console-container reveal">
-                <!-- Sidebar Command List -->
-                <div class="console-sidebar">
-                    <button class="console-cmd-btn active" onclick="selectConsoleCmd(0)"><span>CTABLE</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(1)"><span>LGTABLE</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(2)"><span>ACGT</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(3)"><span>CHKAREA</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(4)"><span>SQAREA</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(5)"><span>DALL</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(6)"><span>LMF2</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(7)"><span>PDALL</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(8)"><span>MF</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(9)"><span>RAM</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(10)"><span>FT</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(11)"><span>TFC</span><span class="mono">▶</span></button>
-                    <button class="console-cmd-btn" onclick="selectConsoleCmd(12)"><span>TIPPON</span><span class="mono">▶</span></button>
-                </div>
-
-                <!-- Console Main Display -->
-                <div class="console-main-panel">
-                    <div class="console-info-box">
-                        <div>
-                            <div class="console-field-lbl">COMMAND NAME</div>
-                            <div class="console-field-val" id="cmdValName" style="color: var(--accent-cyan); font-weight: 700;">_CTABLE</div>
-                        </div>
-                        <div>
-                            <div class="console-field-lbl">DESCRIPTION</div>
-                            <div class="console-field-val" id="cmdValDesc">Generates an automated, formatted Easting/Northing coordinate table for closed parcel vertices directly inside AutoCAD.</div>
-                        </div>
-                        <div>
-                            <div class="console-field-lbl">INPUT REQUIREMENT</div>
-                            <div class="console-field-val" id="cmdValInput">Select Polyline Boundary or Pick Points</div>
-                        </div>
-                        <div>
-                            <div class="console-field-lbl">AUTOMATED OUTPUT</div>
-                            <div class="console-field-val" id="cmdValOutput" style="color: var(--emerald-green);">Formatted CAD Table object with Point IDs, Eastings (X), and Northings (Y).</div>
-                        </div>
-                    </div>
-
-                    <!-- Live Dynamic Canvas Preview -->
-                    <div>
-                        <div class="console-field-lbl" style="margin-bottom: 8px;">LIVE CAD PREVIEW OUTPUT</div>
-                        <canvas id="cmdCanvasPreview"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 4 — TIPPON SIGNATURE FEATURE -->
-    <section class="section" id="tippon">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>TELANGANA REVENUE SPECIFIC</span>
-                </div>
-                <h2 class="section-title">TIPPON. BUILT FOR REAL SURVEY WORK.</h2>
-                <p class="section-subtitle">
-                    Interactive survey vector plotter. Click directional keypad vectors to construct land parcels, calculate closure, and generate Acres/Guntas instantly.
-                </p>
-            </div>
-
-            <div class="tippon-grid reveal">
-                <!-- Keypad Controls -->
-                <div>
-                    <div class="keypad-matrix">
-                        <button class="key-btn" onclick="plotTipponVector('NW')">7 <span class="key-sub">NW</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('N')">8 <span class="key-sub">N</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('NE')">9 <span class="key-sub">NE</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('W')">4 <span class="key-sub">W</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('ENTER')" style="background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan);">5 <span class="key-sub" style="color: var(--accent-cyan);">ENTER</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('E')">6 <span class="key-sub">E</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('SW')">1 <span class="key-sub">SW</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('S')">2 <span class="key-sub">S</span></button>
-                        <button class="key-btn" onclick="plotTipponVector('SE')">3 <span class="key-sub">SE</span></button>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-top: 12px;">
-                        <button class="btn btn-outline" onclick="resetTipponCanvas()" style="width: 50%; font-size: 0.78rem;">RESET</button>
-                        <button class="btn btn-cyan" onclick="presetTipponLand()" style="width: 50%; font-size: 0.78rem;">SAMPLE TIPPON</button>
-                    </div>
-
-                    <div class="tippon-metrics-bar">
-                        <div class="metric-box">
-                            <div class="console-field-lbl">ACRES - GUNTAS</div>
-                            <div class="metric-val" id="tpMetricAcres">1A - 18.5G</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="console-field-lbl">GAJALU (SQ.YD)</div>
-                            <div class="metric-val" id="tpMetricGajalu" style="color: var(--accent-cyan);">7,080.5</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tippon Interactive Canvas -->
-                <div>
-                    <canvas id="tipponInteractiveCanvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 5 — BEFORE / AFTER COMPARISON SLIDER -->
-    <section class="section">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>VISUAL COMPARISON</span>
-                </div>
-                <h2 class="section-title">FROM HOURS OF DRAFTING TO MINUTES.</h2>
-                <p class="section-subtitle">
-                    Drag the slider below to compare cluttered manual drafting against clean, automated Brahmanee survey outputs.
-                </p>
-            </div>
-
-            <div class="ba-container reveal" id="baContainer">
-                <canvas id="baCanvasLeft"></canvas>
-                <canvas id="baCanvasRight"></canvas>
-                <div class="ba-slider-line" id="baLine">
-                    <div class="ba-slider-handle">◄ ►</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 6 — WORKFLOW DIAGRAM -->
-    <section class="section" id="workflow">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>END-TO-END AUTOMATION</span>
-                </div>
-                <h2 class="section-title">FROM FIELD DATA TO FINAL DRAWING.</h2>
-                <p class="section-subtitle">
-                    Continuous data flow connecting field survey measurements directly to finished CAD survey sheets.
-                </p>
-            </div>
-
-            <div class="workflow-diagram reveal">
-                <div class="wf-node">
-                    <div class="wf-step-num">STAGE 01</div>
-                    <div class="wf-step-title">FIELD SURVEY DATA</div>
-                </div>
-                <div class="wf-node">
-                    <div class="wf-step-num">STAGE 02</div>
-                    <div class="wf-step-title">COORDINATE / TIPPON INPUT</div>
-                </div>
-                <div class="wf-node" style="border-color: var(--accent-cyan); background: #0C1A26;">
-                    <div class="wf-step-num" style="color: var(--accent-cyan);">STAGE 03</div>
-                    <div class="wf-step-title" style="color: var(--accent-cyan);">BRAHMANEE AUTOLISP</div>
-                </div>
-                <div class="wf-node">
-                    <div class="wf-step-num">STAGE 04</div>
-                    <div class="wf-step-title">AUTOCAD / CIVIL 3D</div>
-                </div>
-                <div class="wf-node">
-                    <div class="wf-step-num">STAGE 05</div>
-                    <div class="wf-step-title">FINAL SURVEY SHEET</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 7 — PERFORMANCE STATS -->
-    <section class="section">
-        <div class="container">
-            <div class="stats-hero-banner reveal">
-                <div>
-                    <div class="stat-num">45-60</div>
-                    <div class="stat-lbl">MINUTES MANUAL</div>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: center;">
-                    <span style="font-family: var(--font-display); font-size: 2rem; color: var(--accent-orange); font-weight: 700;">VS</span>
-                </div>
-                <div>
-                    <div class="stat-num" style="color: var(--emerald-green);">5-8</div>
-                    <div class="stat-lbl">MINUTES WITH BRAHMANEE</div>
-                </div>
-                <div>
-                    <div class="stat-num" style="color: var(--accent-cyan);">~85%</div>
-                    <div class="stat-lbl">AVERAGE TIME SAVED</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 9 — WHY BRAHMANEE (4 PILLARS) -->
-    <section class="section">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>ENGINEERING ARCHITECTURE</span>
-                </div>
-                <h2 class="section-title">BUILT FOR SURVEYORS. NOT GENERIC CAD USERS.</h2>
-            </div>
-
-            <div class="pillars-grid reveal">
-                <div class="pillar-card">
-                    <div class="pillar-num">PILLAR 01</div>
-                    <div class="pillar-title">SURVEY-FIRST DESIGN</div>
-                    <p style="font-size: 0.88rem; color: var(--text-muted);">
-                        Engineered around actual land survey field data, Tippon measurements, and revenue department specifications.
-                    </p>
-                </div>
-
-                <div class="pillar-card">
-                    <div class="pillar-num">PILLAR 02</div>
-                    <div class="pillar-title">AUTOCAD NATIVE WORKFLOW</div>
-                    <p style="font-size: 0.88rem; color: var(--text-muted);">
-                        Runs directly inside AutoCAD and Civil 3D as native AutoLISP commands without slow external software bridges.
-                    </p>
-                </div>
-
-                <div class="pillar-card">
-                    <div class="pillar-num">PILLAR 03</div>
-                    <div class="pillar-title">TELANGANA-FOCUSED</div>
-                    <p style="font-size: 0.88rem; color: var(--text-muted);">
-                        Built-in conversion for Gajalu (Sq.Yards), Acres, Guntas, and Telangana cadastral Tippon vector standards.
-                    </p>
-                </div>
-
-                <div class="pillar-card">
-                    <div class="pillar-num">PILLAR 04</div>
-                    <div class="pillar-title">OFFLINE HARDWARE LOCK</div>
-                    <p style="font-size: 0.88rem; color: var(--text-muted);">
-                        Secured via MAC & HDD hardware device lock. Works 100% offline without requiring internet connections in the field.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 10 — FOUNDER PROFILE -->
-    <section class="section">
-        <div class="container">
-            <div class="founder-box reveal">
-                <div class="founder-avatar">
-                    <span>NA</span>
-                </div>
-
-                <div>
-                    <div class="tech-badge" style="margin-bottom: 10px;">
-                        <span class="tech-badge-dot"></span>
-                        <span>DEVELOPER & LICENSED SURVEYOR</span>
-                    </div>
-
-                    <h3 style="font-size: 1.8rem; margin-bottom: 8px;">NARRI ANEL KKUMAR</h3>
-                    <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-cyan); margin-bottom: 16px;">
-                        Professional Land Surveyor & AutoLISP Developer
-                    </div>
-
-                    <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px;">
-                        "Having spent years conducting field land surveys and drafting Tippon revenue maps, I experienced firsthand the extreme time wasted on repetitive CAD entry and area calculations. Brahmanee was created to solve these exact bottlenecks directly inside AutoCAD."
-                    </p>
-
-                    <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">
-                        FIELD SURVEY EXPERIENCE ➔ IDENTIFY BOTTLENECK ➔ AUTOLISP AUTOMATION ➔ BRAHMANEE SUITE
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 12 — PRICING -->
-    <section class="section" id="pricing">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>ANNUAL SOFTWARE LICENSE</span>
-                </div>
-                <h2 class="section-title">PROFESSIONAL SURVEY AUTOMATION. ONE ANNUAL LICENSE.</h2>
-            </div>
-
-            <div class="pricing-box reveal">
-                <div class="tech-badge">1 YEAR FULL ACCESS</div>
-                <div class="price-val">₹15,000 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ YEAR</span></div>
-
-                <ul class="price-list">
-                    <li class="price-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Full 13 AutoLISP Command Suite Included</span>
-                    </li>
-                    <li class="price-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>AutoCAD 2010 to 2026 & Civil 3D Compatibility</span>
-                    </li>
-                    <li class="price-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Offline Hardware Device Lock (MAC & HDD Security)</span>
-                    </li>
-                    <li class="price-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>1 Year Free Feature Updates & Maintenance</span>
-                    </li>
-                    <li class="price-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Direct Phone & WhatsApp Technical Support</span>
-                    </li>
-                </ul>
-
-                <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20want%20to%20get%20the%20AutoLISP%20Land%20Survey%20License." target="_blank" class="btn btn-cyan" style="width: 100%; justify-content: center;">
-                    <span>GET BRAHMANEE LICENSE</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 13 — DEMO VIDEO -->
-    <section class="section" id="demo">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>LIVE SOFTWARE DEMONSTRATION</span>
-                </div>
-                <h2 class="section-title">SEE THE AUTOMATION IN ACTION.</h2>
-            </div>
-
-            <div style="max-width: 860px; margin: 0 auto;" class="reveal">
-                <div class="cad-workspace-frame">
-                    <div class="cad-header-bar">
-                        <span>LIVE SOFTWARE DEMO - [YOUTUBE DEMO PREVIEW]</span>
-                        <span style="color: var(--accent-cyan);">1080P HD</span>
-                    </div>
-                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                        <iframe style="position: absolute; top:0; left:0; width:100%; height:100%; border:0;" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=demo" title="Brahmanee Land Survey AutoLISP Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 14 — FAQ -->
-    <section class="section" id="faq">
-        <div class="container">
-            <div class="section-header reveal">
-                <div class="tech-badge">
-                    <span class="tech-badge-dot"></span>
-                    <span>FREQUENTLY ASKED QUESTIONS</span>
-                </div>
-                <h2 class="section-title">FREQUENTLY ASKED QUESTIONS</h2>
-            </div>
-
-            <div class="faq-list reveal">
-                <div class="faq-card">
-                    <div class="faq-head" onclick="toggleFaq(this)">
-                        <span>Which AutoCAD versions are supported?</span>
-                        <span class="mono">▼</span>
-                    </div>
-                    <div class="faq-body">
-                        Brahmanee supports all versions of AutoCAD from 2010 through 2026, as well as Civil 3D and AutoCAD Map 3D on Windows.
-                    </div>
-                </div>
-
-                <div class="faq-card">
-                    <div class="faq-head" onclick="toggleFaq(this)">
-                        <span>Does Brahmanee require an active internet connection?</span>
-                        <span class="mono">▼</span>
-                    </div>
-                    <div class="faq-body">
-                        No. Brahmanee uses hardware-based offline device lock (MAC Address & Hard Drive ID security). Once activated, it works 100% offline in field environments.
-                    </div>
-                </div>
-
-                <div class="faq-card">
-                    <div class="faq-head" onclick="toggleFaq(this)">
-                        <span>How are land areas calculated for Telangana revenue maps?</span>
-                        <span class="mono">▼</span>
-                    </div>
-                    <div class="faq-body">
-                        Brahmanee automatically converts CAD polyline areas into Acres, Guntas, and Gajalu (Square Yards) following Telangana land revenue calculation standards.
-                    </div>
-                </div>
-
-                <div class="faq-card">
-                    <div class="faq-head" onclick="toggleFaq(this)">
-                        <span>How can I purchase and activate my license?</span>
-                        <span class="mono">▼</span>
-                    </div>
-                    <div class="faq-body">
-                        Click "Get License" or contact us via WhatsApp (+91 7711889955). After payment, we provide the installation package and activate your device license immediately.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 15 — FINAL CONTACT & CTA -->
-    <section class="section" style="border-bottom: none;">
-        <div class="container" style="text-align: center;">
-            <div class="tech-badge">
-                <span class="tech-badge-dot"></span>
-                <span>READY TO TRANSFORM YOUR WORKFLOW?</span>
-            </div>
-
-            <h2 class="section-title" style="margin-bottom: 16px;">READY TO AUTOMATE YOUR NEXT SURVEY?</h2>
-            <p class="section-subtitle" style="max-width: 600px; margin: 0 auto 36px;">
-                Spend less time drafting. Spend more time surveying. Join professional land surveyors leveraging Brahmanee AutoLISP.
-            </p>
-
-            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-                <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20want%20to%20get%20the%20AutoLISP%20Land%20Survey%20License." target="_blank" class="btn btn-cyan">
-                    <span>GET BRAHMANEE LICENSE</span>
-                </a>
-                <a href="https://wa.me/917711889955" target="_blank" class="btn btn-orange">
-                    <span>WHATSAPP SUPPORT</span>
-                </a>
-            </div>
-
-            <div style="margin-top: 40px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-dim);">
-                PHONE / WHATSAPP: +91 7711889955 | EMAIL: support@brahmaneelisp.in
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div class="logo-text-title" style="margin-bottom: 6px;">BRAHMANEE</div>
-                    <div class="logo-text-sub" style="margin-bottom: 12px;">LAND SURVEY TOOLS</div>
-                    <p style="font-size: 0.82rem; color: var(--text-dim);">
-                        Professional AutoLISP automation software suite for land surveying, Tippon vector drafting, coordinate tables and cadastral mapping.
-                    </p>
-                </div>
-
-                <div>
-                    <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-main); margin-bottom: 12px;">PRODUCT</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <a href="#commands" style="color: var(--text-muted); text-decoration: none;">13 AutoLISP Commands</a>
-                        <a href="#tippon" style="color: var(--text-muted); text-decoration: none;">Tippon Vector Engine</a>
-                        <a href="#pricing" style="color: var(--text-muted); text-decoration: none;">Annual License</a>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-main); margin-bottom: 12px;">DEVELOPER</div>
-                    <div style="font-size: 0.82rem; color: var(--text-muted);">
-                        Developed by Narri Anel Kkumar<br>
-                        Licensed Land Surveyor & AutoLISP Developer<br>
-                        Telangana, India
-                    </div>
-                </div>
-            </div>
-
-            <div style="border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 0.78rem; color: var(--text-dim);">
-                <span>© 2026 Brahmanee Land Survey Tools. All rights reserved.</span>
-                <span>AutoCAD & Civil 3D are registered trademarks of Autodesk, Inc.</span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MOBILE STICKY BOTTOM ACTION BAR -->
-    <div class="mobile-bottom-bar">
-        <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20want%20to%20get%20the%20AutoLISP%20Land%20Survey%20License." target="_blank" class="btn btn-cyan" style="flex: 1; padding: 10px; font-size: 0.78rem;">
-            <span>GET LICENSE</span>
-        </a>
-        <a href="https://wa.me/917711889955" target="_blank" class="btn btn-orange" style="flex: 1; padding: 10px; font-size: 0.78rem;">
-            <span>WHATSAPP</span>
-        </a>
+<section class="hero grad-bg">
+  <div class="sphere-field">
+    <div class="sphere sph-blue s1"></div>
+    <div class="sphere sph-pink s2"></div>
+    <div class="sphere sph-orange s3"></div>
+    <div class="sphere sph-violet s4"></div>
+    <div class="sphere sph-gold s5"></div>
+  </div>
+  <div class="container sect-inner">
+    <div class="hero-left">
+      <div class="eyebrow"><span class="dash"></span> SURVEY AUTOMATION SUITE</div>
+      <h1 class="hero-title"><span class="animated-brand-title">BRAHMANEE.</span><br><span class="line2">AutoLISP.</span></h1>
+      <div class="hero-kicker">For Land Surveyors.</div>
+      <p class="hero-desc">13 AutoCAD & Civil 3D commands for Tippon drawing, coordinate tables, and Telangana revenue survey work — written and used daily by a working surveyor.</p>
+      <div class="hero-ctas">
+        <a href="https://wa.me/917711889955?text=Hello!%20I%20want%20to%20buy%20the%20Brahmanee%20AutoLISP%20License." target="_blank" class="btn btn-fill">Get Brahmanee License</a>
+        <a href="#commands" class="btn btn-outline">See Commands</a>
+      </div>
+      <div class="side-label"><span class="dot"></span> Surveyor-Built</div>
+      <div class="stats-row"><span class="num">13</span> Commands <span class="sep">—</span> <span>AutoCAD 2010–2026</span></div>
     </div>
-
-    <!-- JAVASCRIPT ENGINE -->
-    <script>
-        // 1. Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 40) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        });
-
-        // 2. CAD Background Grid Canvas
-        function initCadBackground() {
-            const canvas = document.getElementById('cad-bg-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width = canvas.width = window.innerWidth;
-            let height = canvas.height = window.innerHeight;
-
-            window.addEventListener('resize', () => {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            });
-
-            function drawGrid() {
-                ctx.clearRect(0, 0, width, height);
-                ctx.strokeStyle = '#1E2D3A';
-                ctx.lineWidth = 0.5;
-
-                const step = 40;
-                for (let x = 0; x < width; x += step) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, height);
-                    ctx.stroke();
-                }
-                for (let y = 0; y < height; y += step) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(width, y);
-                    ctx.stroke();
-                }
-            }
-            drawGrid();
-        }
-
-        // 3. Hero CAD Workspace Animated Drawing Engine
-        function initHeroCadWorkspace() {
-            const canvas = document.getElementById('heroCadCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width || 500;
-            canvas.height = 400;
-
-            const w = canvas.width;
-            const h = canvas.height;
-
-            const points = [
-                { x: w * 0.2, y: h * 0.75, label: "P1 (100.0, 200.0)" },
-                { x: w * 0.3, y: h * 0.25, label: "P2 (150.0, 450.0)" },
-                { x: w * 0.75, y: h * 0.2, label: "P3 (480.0, 480.0)" },
-                { x: w * 0.85, y: h * 0.65, label: "P4 (520.0, 250.0)" },
-                { x: w * 0.55, y: h * 0.85, label: "P5 (320.0, 120.0)" }
-            ];
-
-            let progress = 0;
-
-            function renderFrame() {
-                ctx.clearRect(0, 0, w, h);
-
-                // CAD Grid inside view
-                ctx.strokeStyle = '#0B1722';
-                ctx.lineWidth = 1;
-                for (let x = 0; x < w; x += 30) {
-                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-                }
-                for (let y = 0; y < h; y += 30) {
-                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-                }
-
-                // Draw parcel lines according to progress
-                ctx.strokeStyle = '#00E5FF';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-
-                const totalSegments = points.length;
-                const currentSegment = Math.floor(progress * totalSegments);
-                const segProgress = (progress * totalSegments) % 1;
-
-                ctx.moveTo(points[0].x, points[0].y);
-
-                for (let i = 0; i < currentSegment; i++) {
-                    const next = points[(i + 1) % points.length];
-                    ctx.lineTo(next.x, next.y);
-                }
-
-                if (currentSegment < totalSegments) {
-                    const p1 = points[currentSegment];
-                    const p2 = points[(currentSegment + 1) % points.length];
-                    const curX = p1.x + (p2.x - p1.x) * segProgress;
-                    const curY = p1.y + (p2.y - p1.y) * segProgress;
-                    ctx.lineTo(curX, curY);
-
-                    // Crosshair on cursor
-                    ctx.strokeStyle = '#FF6B00';
-                    ctx.beginPath();
-                    ctx.moveTo(curX - 10, curY); ctx.lineTo(curX + 10, curY);
-                    ctx.moveTo(curX, curY - 10); ctx.lineTo(curX, curY + 10);
-                    ctx.stroke();
-                    ctx.strokeStyle = '#00E5FF';
-                }
-
-                ctx.stroke();
-
-                // Fill polygon if complete
-                if (progress >= 0.95) {
-                    ctx.fillStyle = 'rgba(0, 229, 255, 0.08)';
-                    ctx.beginPath();
-                    ctx.moveTo(points[0].x, points[0].y);
-                    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    // Text Area Label
-                    ctx.fillStyle = '#FF6B00';
-                    ctx.font = '12px JetBrains Mono';
-                    ctx.fillText('AREA: 1A - 22.5G', w * 0.42, h * 0.52);
-                }
-
-                // Draw Vertices
-                points.forEach((p) => {
-                    ctx.fillStyle = '#00E5FF';
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#9AAAB8';
-                    ctx.font = '10px JetBrains Mono';
-                    ctx.fillText(p.label, p.x + 6, p.y - 6);
-                });
-
-                progress += 0.003;
-                if (progress > 1.1) progress = 0;
-
-                requestAnimationFrame(renderFrame);
-            }
-
-            renderFrame();
-        }
-
-        // 4. Command Console Data & Switcher
-        const commandsData = [
-            { name: "_CTABLE", desc: "Generates an automated Easting/Northing coordinate table for closed polyline vertices directly inside AutoCAD.", input: "Select Polyline Boundary or Pick Points", output: "Formatted CAD Table object with Point IDs, X, and Y." },
-            { name: "_LGTABLE", desc: "Line and Segment Table command that calculates bearings, distances, and azimuths for all parcel legs.", input: "Select Closed Boundary", output: "Line segment table with Leg IDs, Bearings & Distances." },
-            { name: "_ACGT", desc: "Instant conversion of CAD polyline area into Acres, Guntas, and Square Yards (Gajalu) formatted text.", input: "Pick Internal Point or Select Polyline", output: "Formatted Area Label inside CAD Drawing." },
-            { name: "_CHKAREA", desc: "Closure & Area verification tool ensuring mathematical accuracy across revenue survey boundary parcels.", input: "Select Survey Polygon", output: "Closure error report & Verified Area statement." },
-            { name: "_SQAREA", desc: "Square feet and Square meters area annotation tool for urban and layout survey maps.", input: "Pick Closed Boundary", output: "Sq.Ft and Sq.M area annotation." },
-            { name: "_DALL", desc: "Automatic dimensioning command that adds aligned dimensions to all segments of a polyline in 1 click.", input: "Select Polyline", output: "All exterior segment dimensions applied." },
-            { name: "_LMF2", desc: "Map fitting & scale adjustment utility for aligning scanned Tippon maps onto digital CAD vectors.", input: "Select Reference Vectors", output: "Scaled & aligned parcel geometry." },
-            { name: "_PDALL", desc: "Perpendicular offsets dimensioning tool for baseline survey offsets and Tippon ladder lines.", input: "Select Baseline & Offset Points", output: "Perpendicular dimension lines." },
-            { name: "_MF", desc: "Merge Fields command for uniting adjacent cadastral land sub-divisions while preserving total area math.", input: "Select Adjacent Parcels", output: "Merged boundary polyline & updated area." },
-            { name: "_RAM", desc: "Road Alignment and Margin calculator for layout setbacks and cadastral road acquisitions.", input: "Select Road Centerline & Width", output: "Offset margin lines & area deducted." },
-            { name: "_FT", desc: "Feet-to-Meters and Chains-to-Meters quick unit converter for historical Tippon survey records.", input: "Input distance value", output: "Converted metric distance value." },
-            { name: "_TFC", desc: "Telangana Field Coordinate converter for converting Tippon links into modern metric CAD coordinates.", input: "Select Tippon Link Coordinates", output: "Plotted CAD vectors." },
-            { name: "_TIPPON", desc: "Signature Tippon vector plotter for drawing land survey maps using directional keypad vectors.", input: "Keypad directions & distances", output: "Complete Tippon cadastral parcel." }
-        ];
-
-        function selectConsoleCmd(idx) {
-            const btns = document.querySelectorAll('.console-cmd-btn');
-            btns.forEach((b, i) => {
-                if (i === idx) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-
-            const data = commandsData[idx];
-            document.getElementById('cmdValName').innerText = data.name;
-            document.getElementById('cmdValDesc').innerText = data.desc;
-            document.getElementById('cmdValInput').innerText = data.input;
-            document.getElementById('cmdValOutput').innerText = data.output;
-
-            drawCmdPreviewCanvas(data.name);
-        }
-
-        function drawCmdPreviewCanvas(cmdName) {
-            const canvas = document.getElementById('cmdCanvasPreview');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width || 400;
-            canvas.height = 320;
-
-            const w = canvas.width;
-            const h = canvas.height;
-
-            ctx.clearRect(0, 0, w, h);
-
-            // Grid
-            ctx.strokeStyle = '#0B1622';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < w; x += 25) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-            for (let y = 0; y < h; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-
-            // Draw illustrative CAD preview
-            ctx.strokeStyle = '#00E5FF';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.rect(w * 0.2, h * 0.2, w * 0.6, h * 0.5);
-            ctx.stroke();
-
-            ctx.fillStyle = 'rgba(0, 229, 255, 0.1)';
-            ctx.fill();
-
-            // Dimensions / Table simulation
-            ctx.fillStyle = '#FF6B00';
-            ctx.font = '11px JetBrains Mono';
-            ctx.fillText(`COMMAND: ${cmdName} EXECUTED`, w * 0.25, h * 0.45);
-            ctx.fillText('AREA: 2A - 10.0G (11,011 SQ.YD)', w * 0.25, h * 0.55);
-        }
-
-        // 5. Interactive Tippon Keypad Engine
-        let tipponPoints = [];
-        function resetTipponCanvas() {
-            tipponPoints = [];
-            updateTipponCanvas();
-        }
-
-        function presetTipponLand() {
-            const canvas = document.getElementById('tipponInteractiveCanvas');
-            if (!canvas) return;
-            const w = canvas.width;
-            const h = canvas.height;
-            tipponPoints = [
-                { x: w * 0.2, y: h * 0.7 },
-                { x: w * 0.25, y: h * 0.25 },
-                { x: w * 0.75, y: h * 0.2 },
-                { x: w * 0.8, y: h * 0.65 },
-                { x: w * 0.5, y: h * 0.8 }
-            ];
-            updateTipponCanvas();
-        }
-
-        function plotTipponVector(dir) {
-            const canvas = document.getElementById('tipponInteractiveCanvas');
-            if (!canvas) return;
-            const w = canvas.width;
-            const h = canvas.height;
-
-            if (tipponPoints.length === 0) {
-                tipponPoints.push({ x: w * 0.5, y: h * 0.5 });
-            }
-
-            const last = tipponPoints[tipponPoints.length - 1];
-            let dx = 0, dy = 0;
-            const step = 45;
-
-            switch (dir) {
-                case 'N': dy = -step; break;
-                case 'S': dy = step; break;
-                case 'E': dx = step; break;
-                case 'W': dx = -step; break;
-                case 'NE': dx = step * 0.7; dy = -step * 0.7; break;
-                case 'NW': dx = -step * 0.7; dy = -step * 0.7; break;
-                case 'SE': dx = step * 0.7; dy = step * 0.7; break;
-                case 'SW': dx = -step * 0.7; dy = step * 0.7; break;
-                case 'ENTER':
-                    if (tipponPoints.length > 2) {
-                        tipponPoints.push({ x: tipponPoints[0].x, y: tipponPoints[0].y });
-                    }
-                    break;
-            }
-
-            if (dir !== 'ENTER') {
-                tipponPoints.push({ x: last.x + dx, y: last.y + dy });
-            }
-
-            updateTipponCanvas();
-        }
-
-        function updateTipponCanvas() {
-            const canvas = document.getElementById('tipponInteractiveCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width || 500;
-            canvas.height = 420;
-
-            const w = canvas.width;
-            const h = canvas.height;
-
-            ctx.clearRect(0, 0, w, h);
-
-            // Grid
-            ctx.strokeStyle = '#0B1622';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < w; x += 25) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-            for (let y = 0; y < h; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-
-            if (tipponPoints.length > 0) {
-                ctx.strokeStyle = '#00E5FF';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(tipponPoints[0].x, tipponPoints[0].y);
-
-                for (let i = 1; i < tipponPoints.length; i++) {
-                    ctx.lineTo(tipponPoints[i].x, tipponPoints[i].y);
-                }
-
-                ctx.stroke();
-
-                if (tipponPoints.length >= 3) {
-                    ctx.fillStyle = 'rgba(0, 229, 255, 0.12)';
-                    ctx.fill();
-                }
-
-                tipponPoints.forEach((p, i) => {
-                    ctx.fillStyle = '#FF6B00';
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#F5F7FA';
-                    ctx.font = '10px JetBrains Mono';
-                    ctx.fillText(`P${i + 1}`, p.x + 6, p.y - 6);
-                });
-            }
-
-            // Update Metrics
-            const count = tipponPoints.length;
-            const gajalu = (count * 1416.1).toFixed(1);
-            const acres = Math.floor(gajalu / 4840);
-            const guntas = ((gajalu % 4840) / 121).toFixed(1);
-
-            document.getElementById('tpMetricAcres').innerText = count >= 3 ? `${acres}A - ${guntas}G` : '0A - 0G';
-            document.getElementById('tpMetricGajalu').innerText = count >= 3 ? Number(gajalu).toLocaleString('en-IN') : '0';
-        }
-
-        // 6. Before / After Comparison Slider Engine
-        function initBeforeAfterSlider() {
-            const container = document.getElementById('baContainer');
-            const line = document.getElementById('baLine');
-            const canvasLeft = document.getElementById('baCanvasLeft');
-            const canvasRight = document.getElementById('baCanvasRight');
-
-            if (!container || !line || !canvasLeft || !canvasRight) return;
-
-            let isDragging = false;
-            let sliderPos = 0.5;
-
-            function renderBACanvases() {
-                const w = container.clientWidth;
-                const h = container.clientHeight;
-
-                canvasLeft.width = canvasRight.width = w;
-                canvasLeft.height = canvasRight.height = h;
-
-                const ctxL = canvasLeft.getContext('2d');
-                const ctxR = canvasRight.getContext('2d');
-
-                // Left: Manual Cluttered Drawing
-                ctxL.clearRect(0, 0, w, h);
-                ctxL.fillStyle = '#050B10';
-                ctxL.fillRect(0, 0, w, h);
-                ctxL.strokeStyle = '#3A5266';
-                ctxL.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.8);
-                ctxL.fillStyle = '#EF4444';
-                ctxL.font = '14px JetBrains Mono';
-                ctxL.fillText('MANUAL CAD DRAFTING (CLUTTERED / UNFORMATTED)', 20, 30);
-
-                // Right: Clean Automated Output
-                ctxR.clearRect(0, 0, w, h);
-                ctxR.fillStyle = '#07121B';
-                ctxR.fillRect(0, 0, w, h);
-                ctxR.strokeStyle = '#00E5FF';
-                ctxR.lineWidth = 2;
-                ctxR.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.8);
-                ctxR.fillStyle = 'rgba(0, 229, 255, 0.1)';
-                ctxR.fillRect(w * 0.1, h * 0.1, w * 0.8, h * 0.8);
-
-                ctxR.fillStyle = '#00E5FF';
-                ctxR.font = '14px JetBrains Mono';
-                ctxR.fillText('BRAHMANEE AUTOMATED SURVEY SHEET', 20, 30);
-                ctxR.fillStyle = '#FF6B00';
-                ctxR.fillText('100% MATHEMATICAL CLOSURE VERIFIED', 20, 55);
-
-                // Clip Right Canvas based on sliderPos
-                canvasRight.style.clipPath = `inset(0 0 0 ${sliderPos * 100}%)`;
-                line.style.left = `${sliderPos * 100}%`;
-            }
-
-            container.addEventListener('mousedown', () => isDragging = true);
-            window.addEventListener('mouseup', () => isDragging = false);
-            container.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                const rect = container.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                if (x < 0) x = 0;
-                if (x > rect.width) x = rect.width;
-                sliderPos = x / rect.width;
-                renderBACanvases();
-            });
-
-            renderBACanvases();
-        }
-
-        // 7. FAQ Accordion Toggle
-        function toggleFaq(el) {
-            const card = el.parentElement;
-            card.classList.toggle('active');
-        }
-
-        // 9. Scroll Reveal Observer
-        function initScrollReveal() {
-            const elements = document.querySelectorAll('.reveal');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            elements.forEach(el => observer.observe(el));
-        }
-
-        // DOM Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            initCadBackground();
-            initHeroCadWorkspace();
-            selectConsoleCmd(0);
-            presetTipponLand();
-            initBeforeAfterSlider();
-            initScrollReveal();
-        });
-    </script>
+  </div>
+</section>
+
+<section class="section grad-bg" id="problem">
+  <div class="container sect-inner">
+    <div class="section-head">
+      <span class="eyebrow" style="display:inline-flex;"><span class="dash"></span> THE GAP</span>
+      <h2 class="section-title">Every surveyor knows the repeated, avoidable work.</h2>
+      <p class="section-sub">Manual CAD plotting eats an hour per sheet, and every hand-typed coordinate is a chance for a revenue-record error.</p>
+    </div>
+    <div class="glass reg-cols">
+      <div class="reg-col">
+        <h3>🖊 Manual Drafting</h3>
+        <div class="reg-row"><span>Typing coordinates by hand</span><span class="tag-bad">Slow</span></div>
+        <div class="reg-row"><span>Drawing each boundary line</span><span class="tag-bad">Repetitive</span></div>
+        <div class="reg-row"><span>Acres–Guntas math on paper</span><span class="tag-bad">Error-prone</span></div>
+        <div class="reg-row"><span>Copying tables into Excel</span><span class="tag-bad">Clunky</span></div>
+        <div class="reg-row"><span>Fitting Tippon boundaries by eye</span><span class="tag-bad">Tedious</span></div>
+      </div>
+      <div class="reg-col">
+        <h3>⚡ With Brahmanee</h3>
+        <div class="reg-row"><span>Type one command — CTABLE / TIPPON</span><span class="tag-good">Instant</span></div>
+        <div class="reg-row"><span>Boundary geometry drawn for you</span><span class="tag-good">Precise</span></div>
+        <div class="reg-row"><span>Acres, Guntas auto-calculated</span><span class="tag-good">Accurate</span></div>
+        <div class="reg-row"><span>Native CAD coordinate table</span><span class="tag-good">Automated</span></div>
+        <div class="reg-row"><span>Numpad-directional Tippon plotting</span><span class="tag-good">One click</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section grad-bg" id="commands">
+  <div class="container sect-inner">
+    <div class="section-head">
+      <span class="eyebrow" style="display:inline-flex;"><span class="dash"></span> THE SUITE</span>
+      <h2 class="section-title">13 commands. One survey automation suite.</h2>
+      <p class="section-sub">Select any command to see its syntax, input and output — exactly as it behaves inside AutoCAD.</p>
+    </div>
+    <div class="glass cmd-shell">
+      <div class="cmd-list" id="cmdList"></div>
+      <div class="cmd-detail" id="cmdDetail"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section grad-bg" id="tippon">
+  <div class="container sect-inner">
+    <div class="section-head">
+      <span class="eyebrow" style="display:inline-flex;"><span class="dash"></span> TELANGANA SPECIFIC</span>
+      <h2 class="section-title">Tippon. Built for real revenue survey work.</h2>
+      <p class="section-sub">Click the directional keypad to plot boundary vectors the way you would on paper, and watch the Acres–Guntas total update live.</p>
+    </div>
+    <div class="tippon-grid">
+      <div class="glass">
+        <div class="keypad">
+          <button class="key" onclick="plotVec('NW')">7<span class="sub">NW</span></button>
+          <button class="key" onclick="plotVec('N')">8<span class="sub">N</span></button>
+          <button class="key" onclick="plotVec('NE')">9<span class="sub">NE</span></button>
+          <button class="key" onclick="plotVec('W')">4<span class="sub">W</span></button>
+          <button class="key enter" onclick="plotVec('ENTER')">5<span class="sub">CLOSE</span></button>
+          <button class="key" onclick="plotVec('E')">6<span class="sub">E</span></button>
+          <button class="key" onclick="plotVec('SW')">1<span class="sub">SW</span></button>
+          <button class="key" onclick="plotVec('S')">2<span class="sub">S</span></button>
+          <button class="key" onclick="plotVec('SE')">3<span class="sub">SE</span></button>
+        </div>
+        <div class="tippon-actions">
+          <button class="btn btn-outline" style="width:50%;justify-content:center;" onclick="resetTippon()">Reset</button>
+          <button class="btn btn-fill" style="width:50%;justify-content:center;" onclick="presetTippon()">Sample Plot</button>
+        </div>
+        <div class="tippon-metrics">
+          <div><div class="metric-lbl">Acres — Guntas</div><div class="metric-val" id="mAcres">0A – 0G</div></div>
+          <div><div class="metric-lbl">Gajalu (Sq.Yd)</div><div class="metric-val" id="mGaj" style="color:#8fd0ff;">0</div></div>
+        </div>
+      </div>
+      <div class="glass tippon-canvas-wrap">
+        <canvas id="tipponCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section grad-bg" id="pricing">
+  <div class="container sect-inner">
+    <div class="section-head" style="margin:0 auto 44px;text-align:center;">
+      <span class="eyebrow" style="display:inline-flex;"><span class="dash"></span> LICENSE</span>
+      <h2 class="section-title">One annual license. Full suite.</h2>
+    </div>
+    <div class="glass license-card">
+      <span class="pill">1 Year — Full Access</span>
+      <div class="license-price">₹15,000 <span>/ year</span></div>
+      <ul class="price-list">
+        <li>Full 13 AutoLISP command suite</li>
+        <li>AutoCAD 2010–2026 & Civil 3D compatibility</li>
+        <li>Offline hardware device lock (MAC + HDD security)</li>
+        <li>1 year of free feature updates & maintenance</li>
+        <li>Direct phone & WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/917711889955?text=Hello%20Brahmanee!%20I%20want%20to%20get%20the%20AutoLISP%20Land%20Survey%20License." target="_blank" class="btn btn-fill" style="width:100%;justify-content:center;">Get Brahmanee License</a>
+    </div>
+  </div>
+</section>
+
+<section class="section grad-bg" id="faq" style="border-bottom:none;">
+  <div class="container sect-inner">
+    <div class="section-head">
+      <span class="eyebrow" style="display:inline-flex;"><span class="dash"></span> QUESTIONS</span>
+      <h2 class="section-title">Frequently asked</h2>
+    </div>
+    <div class="glass" style="max-width:760px;padding:8px 24px;">
+      <div class="faq-item">
+        <div class="faq-head" onclick="toggleFaq(this)"><span>Which AutoCAD versions are supported?</span><span class="mark mono">+</span></div>
+        <div class="faq-body">Brahmanee supports AutoCAD 2010 through 2026, plus Civil 3D and AutoCAD Map 3D, on Windows.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-head" onclick="toggleFaq(this)"><span>Does it need an internet connection?</span><span class="mark mono">+</span></div>
+        <div class="faq-body">No. Licensing uses an offline hardware device lock (MAC address + hard drive ID). Once activated, it works fully offline in the field.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-head" onclick="toggleFaq(this)"><span>How are areas calculated for Telangana revenue maps?</span><span class="mark mono">+</span></div>
+        <div class="faq-body">CAD polyline areas are automatically converted to Acres, Guntas and Gajalu (Sq.Yd), following Telangana land revenue calculation standards.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-head" onclick="toggleFaq(this)"><span>How do I buy and activate a license?</span><span class="mark mono">+</span></div>
+        <div class="faq-body">Tap "Get License" or message us on WhatsApp at +91 7711889955. After payment, we send the installer and activate your device the same day.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="grad-bg">
+  <div class="container sect-inner">
+    <div class="footer-grid">
+      <div>
+        <div style="font-weight:700;font-size:1.05rem;margin-bottom:4px;">BRAHMANEE</div>
+        <div class="mono" style="font-size:0.7rem;letter-spacing:0.1em;color:var(--text-faint);margin-bottom:14px;text-transform:uppercase;">Land Survey Tools</div>
+        <p style="font-size:0.86rem;color:var(--text-faint);max-width:38ch;">AutoLISP automation for land surveying, Tippon drafting, coordinate tables and Telangana cadastral mapping.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#commands">13 AutoLISP commands</a>
+        <a href="#tippon">Tippon engine</a>
+        <a href="#pricing">Annual license</a>
+      </div>
+      <div>
+        <h4>Developer</h4>
+        <p style="font-size:0.86rem;color:var(--text-dim);">Narri Anel Kkumar<br>Land Surveyor & AutoLISP Developer<br>Yadadri Bhuvanagiri, Telangana</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>WhatsApp / Phone: +91 7711889955</span>
+      <span>© Brahmanee Land Survey Tools</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const CMDS = [
+  {n:"CTABLE", d:"Generates a formatted Easting/Northing coordinate table for closed parcel vertices directly inside AutoCAD.", i:"Select polyline boundary or pick points", o:"Formatted CAD table with Point ID, Easting (X), Northing (Y)."},
+  {n:"LGTABLE", d:"Draws a pre-formatted survey legend table with auto-numbered rows and colour-hatched legend swatches.", i:"Total rows + Sy.No / Classification / Extent per row", o:"Bordered legend table with solid-hatch colour key."},
+  {n:"ACGT", d:"Labels a selected polyline's area in Acres and Guntas at a picked point.", i:"Select closed polyline", o:"Text label: Ac. 0X – XX.XX Gts."},
+  {n:"CHKAREA", d:"Shows full area detail — Acres/Guntas and Sq.Metres — in an alert dialog and the command line.", i:"Select closed polyline", o:"Alert box + printed area breakdown."},
+  {n:"SQAREA", d:"Labels area in Sq.Metres and Sq.Feet, centred inside the selected boundary.", i:"Select polyline / rectangle", o:"Centred MTEXT with Sq.m and Sq.ft."},
+  {n:"DALL", d:"Aligned dimension showing both metres and feet on one dimension line.", i:"Select line/polyline segment + dimension placement", o:"Dual-unit aligned dimension."},
+  {n:"LMF2", d:"Places a metres/feet label aligned to a selected line's angle.", i:"Select line", o:"Rotated text label: Xm / Yft."},
+  {n:"PDALL", d:"Auto-dimensions every segment of a polyline in one pass, dual units.", i:"Select polyline + text height", o:"Aligned dimension per segment."},
+  {n:"MF", d:"Places a below-line label in metres and feet-inches for a picked segment.", i:"Select line/polyline segment", o:"Text: X.XXm / Y'-Z\"."},
+  {n:"RAM", d:"Places a below-line label in Rupees-Annas and metres — the traditional revenue notation.", i:"Select line/polyline segment", o:"Text: 15-5 (30.40m)."},
+  {n:"FT", d:"Places a below-line label in feet and inches only.", i:"Select line/polyline segment", o:"Text: 15'-5\"."},
+  {n:"TFC", d:"Tippon Fix, Connect — snaps a loose line end exactly to a target point after ALIGN, and auto-updates its Rs-Annas/metres label.", i:"Select loose line end, snap to target point", o:"Corrected geometry + updated label."},
+  {n:"TIPPON", d:"Interactive numpad-directional drawing — enter a Rupee-Anna or metre value, press 8/2/4/6 to draw that vector.", i:"Start point + distance + direction key", o:"Series of labelled boundary lines."},
+];
+function renderCmdList(){
+  document.getElementById('cmdList').innerHTML = CMDS.map((c,i)=>`<button class="cmd-item ${i===0?'active':''}" data-i="${i}" onclick="selectCmd(${i})"><span class="num">${String(i+1).padStart(2,'0')}</span><span>${c.n}</span></button>`).join('');
+}
+function selectCmd(i){
+  document.querySelectorAll('.cmd-item').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`.cmd-item[data-i="${i}"]`).classList.add('active');
+  const c = CMDS[i];
+  document.getElementById('cmdDetail').innerHTML = `
+    <div class="lbl">Command</div><div class="val mono-em">${c.n}</div>
+    <div class="lbl">Description</div><div class="val">${c.d}</div>
+    <div class="lbl">Input</div><div class="val">${c.i}</div>
+    <div class="lbl">Output</div><div class="val out">${c.o}</div>`;
+}
+renderCmdList(); selectCmd(0);
+function toggleFaq(el){ el.parentElement.classList.toggle('active'); }
+
+let tPoints = [];
+function tCanvas(){ return document.getElementById('tipponCanvas'); }
+function drawTippon(){
+  const canvas = tCanvas();
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width || 500; canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+  for(let x=0;x<w;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+  for(let y=0;y<h;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+  if(tPoints.length>0){
+    ctx.strokeStyle = '#8fd0ff'; ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.moveTo(tPoints[0].x, tPoints[0].y);
+    for(let i=1;i<tPoints.length;i++) ctx.lineTo(tPoints[i].x, tPoints[i].y);
+    ctx.stroke();
+    if(tPoints.length>=3){ ctx.fillStyle='rgba(224,56,142,0.12)'; ctx.fill(); }
+    tPoints.forEach((p,i)=>{
+      ctx.fillStyle = '#E0388E';
+      ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '10px IBM Plex Mono';
+      ctx.fillText('P'+(i+1), p.x+6, p.y-6);
+    });
+  }
+  const count = tPoints.length;
+  const gaj = (count*1416.1).toFixed(1);
+  const acres = Math.floor(gaj/4840);
+  const guntas = ((gaj%4840)/121).toFixed(1);
+  document.getElementById('mAcres').innerText = count>=3 ? `${acres}A – ${guntas}G` : '0A – 0G';
+  document.getElementById('mGaj').innerText = count>=3 ? Number(gaj).toLocaleString('en-IN') : '0';
+}
+function resetTippon(){ tPoints=[]; drawTippon(); }
+function presetTippon(){
+  const c = tCanvas(); const w=c.width||500, h=420;
+  tPoints = [{x:w*0.2,y:h*0.7},{x:w*0.25,y:h*0.25},{x:w*0.75,y:h*0.2},{x:w*0.8,y:h*0.65},{x:w*0.5,y:h*0.8}];
+  drawTippon();
+}
+function plotVec(dir){
+  const c = tCanvas(); const w=c.width||500, h=420;
+  if(tPoints.length===0) tPoints.push({x:w*0.5,y:h*0.5});
+  const last = tPoints[tPoints.length-1];
+  let dx=0,dy=0; const step=44;
+  switch(dir){
+    case 'N': dy=-step; break; case 'S': dy=step; break;
+    case 'E': dx=step; break; case 'W': dx=-step; break;
+    case 'NE': dx=step*0.7; dy=-step*0.7; break; case 'NW': dx=-step*0.7; dy=-step*0.7; break;
+    case 'SE': dx=step*0.7; dy=step*0.7; break; case 'SW': dx=-step*0.7; dy=step*0.7; break;
+    case 'ENTER': if(tPoints.length>2) tPoints.push({x:tPoints[0].x,y:tPoints[0].y}); break;
+  }
+  if(dir!=='ENTER') tPoints.push({x:last.x+dx, y:last.y+dy});
+  drawTippon();
+}
+window.addEventListener('DOMContentLoaded', ()=>{ presetTippon(); });
+window.addEventListener('resize', drawTippon);
+</script>
 </body>
 </html>
